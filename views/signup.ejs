@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles/style.css">
+  <title>회원 가입</title>
+</head>
+<body>
+  <h1>회원 가입</h1>
+  <form action="/api/signup" method="POST"> <!-- 수정된 부분 -->
+    <label for="school">학교 선택:</label>
+    <select id="school" name="school" required>
+      <option value="" disabled selected>학교를 선택하세요</option>
+      <% schools.forEach(school => { %>
+        <option value="<%- school %>"><%- school %></option>
+      <% }); %>
+    </select>
+
+    <label for="name">담당자 이름:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="phone">전화번호:</label>
+    <div>
+      <input type="text" id="phoneAreaCode" name="phoneAreaCode" value="032" readonly>
+      <input type="text" id="phone" name="phone" required>
+    </div>
+
+    <label for="password">비밀번호:</label>
+    <input type="password" id="password" name="password" required>
+
+    <button type="submit">가입하기</button>
+  </form>
+</body>
+</html>
+

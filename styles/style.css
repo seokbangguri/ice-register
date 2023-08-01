@@ -1,0 +1,37 @@
+/* styles.css */
+
+/* 네비게이션 바 스타일 */
+.navbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+  background-color: #fff;
+  color: #fff;
+  padding: 10px;
+}
+
+.navbar a {
+  color: #000;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+/* 로그인 버튼 스타일 */
+.login-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+/* 기타 원하는 스타일 추가 */
+

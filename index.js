@@ -1,18 +1,20 @@
 require('dotenv').config();
 
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const apiRouter = require('./apis/api'); // apis 폴더에 있는 api.js 파일을 불러옴
+const apiRouter = require('./apis/api');
+const schoolList = require('./src/schoolList');
 
 const app = express();
 const port = 3000;
 const testKey = process.env.TEST;
 
 // MongoDB 연결
-mongoose.connect('mongodb://localhost:27017/mydatabase', {
+mongoose.connect('mongodb://localhost:27017/memberShip', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -27,11 +29,30 @@ mongoose.connect('mongodb://localhost:27017/mydatabase', {
 // 미들웨어 설정
 app.use(cors());
 app.use(bodyParser.json());
+app.use(session({
+	secret: 'seokbangguri',
+	resave: false,
+	saveUninitialized: false,
+}));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
+app.use('/styles', express.static(__dirname + '/styles'));
 
 // 라우터 설정
 app.use('/api', apiRouter); // /api 경로로 들어오는 요청은 apiRouter로 전달
+
+app.get('/', (req,res) => {
+	const user = req.session.user;
+	res.render('index', {user});
+});
+
+app.get('/login', (req,res) => {
+	res.render('login');
+});
+
+app.get('/signup', (req,res) => {
+        res.render('signup', {schools: schoolList});
+});
 
 // 서버 실행
 app.listen(port, () => {
