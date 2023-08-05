@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const apiRouter = require('./apis/api');
@@ -13,22 +13,26 @@ const app = express();
 const port = 3000;
 const testKey = process.env.TEST;
 
-// MongoDB 연결
-mongoose.connect('mongodb://localhost:27017/memberShip', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log('MongoDB에 연결되었습니다.');
-	  console.log(testKey);
-  })
-  .catch((err) => {
-    console.error('MongoDB 연결 오류:', err);
-  });
+//mysql 접속
+const connection = mysql.createConnection({
+	host: 'localhost',
+	user: 'seokbangguri',
+	password: '1234',
+	database: 'ice'
+});
+
+connection.connect((err) => {
+	if(err) {
+		console.error('MySQL 연결 오류:', err);
+	} else {
+		console.log('MySQL에 정상 접속.');
+	}
+});
 
 // 미들웨어 설정
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
 	secret: 'seokbangguri',
 	resave: false,
@@ -42,7 +46,7 @@ app.use('/styles', express.static(__dirname + '/styles'));
 app.use('/api', apiRouter); // /api 경로로 들어오는 요청은 apiRouter로 전달
 
 app.get('/', (req,res) => {
-	const user = req.session.user;
+        const user = req.session.user;
 	res.render('index', {user});
 });
 
@@ -51,7 +55,9 @@ app.get('/login', (req,res) => {
 });
 
 app.get('/signup', (req,res) => {
-        res.render('signup', {schools: schoolList});
+	console.log(req.body);
+        const user = req.session.user;
+        res.render('signup', {schools: schoolList, user: req.session.user});
 });
 
 // 서버 실행

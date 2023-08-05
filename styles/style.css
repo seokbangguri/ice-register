@@ -33,5 +33,31 @@
   background-color: #0056b3;
 }
 
+.container {
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+	margin: auto;
+	margin-top: 40px;
+	justify-content: center;
+	align-items: center;
+	border-radius: 20px;
+	box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
+}
+
+.signup {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 65%;
+}
+
+.signup label,button {
+	margin-top: 20px;
+}
+.signup button {
+	margin-bottom: 20px;
+	height: 30px
+}
 /* 기타 원하는 스타일 추가 */
 

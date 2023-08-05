@@ -25,7 +25,6 @@
                     <a href="/login">로그인</a>
                 <% } %>
             <% } else { %>
-                <a href="/login">로그인</a>
             <% } %>
         </div>
     </nav>
@@ -33,10 +32,22 @@
 
     <!-- 여기에 본문 내용을 작성하세요 -->
     <div class="container mt-4">
-        <h1>여기는 본문입니다.</h1>
+	    <h1>로그인</h1>
+	    <form action="/api/login" method="POST" class="signup">
+		    <label for="username">사용자 이름:</label>
+		    <input type="text" id="username" name="username" required>
+		    <label for="password">비밀번호:</label>
+		    <input type="password" id="password" name="password" required>
+		    <button type="submit">로그인</button>
+	    </form>
+	    <p><a href="/signup">회원가입</a></p>
     </div>
 
     <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
+    <!-- Bootstrap 및 jQuery 스크립트 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

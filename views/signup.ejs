@@ -7,8 +7,29 @@
   <title>회원 가입</title>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="navbar-left" style="display: flex; color: black;">
+            <a href="/"><img src="https://www.ice.go.kr/images/template/00005/common/logo.png" alt="로고"></a>
+            <h3>학교로 찾아가는 노동인권교육 추가모집</h3>
+        </div>
+        <div class="navbar-right">
+            <% if (user) { %>
+                <% if (user.loggedIn) { %>
+                    <a href="/apply">교육신청</a>
+                    <a href="/mypage">마이페이지</a>
+                    <a href="/logout">로그아웃</a>
+                <% } else { %>
+                    <a href="/">로그인</a>
+                <% } %>
+            <% } else { %>
+                    <a href="/">로그인</a>
+            <% } %>
+        </div>
+    </nav>
+    <hr>
+    <div class="container mt-4">
   <h1>회원 가입</h1>
-  <form action="/api/signup" method="POST"> <!-- 수정된 부분 -->
+  <form action="/api/signup" method="POST" class="signup"> <!-- 수정된 부분 -->
     <label for="school">학교 선택:</label>
     <select id="school" name="school" required>
       <option value="" disabled selected>학교를 선택하세요</option>
@@ -31,6 +52,11 @@
 
     <button type="submit">가입하기</button>
   </form>
+    </div>
+    <!-- Bootstrap 및 jQuery 스크립트 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
 
