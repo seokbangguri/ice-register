@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles/style.css">
+    <title>My Website</title>
+    <!-- 여기에 필요한 CSS 파일들을 링크하세요 -->
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-left" style="display: flex; color: black;">
+            <a><img src="https://www.ice.go.kr/images/template/00005/common/logo.png" alt="로고"></a>
+	    <h3>학교로 찾아가는 노동인권교육 추가모집</h3>
+        </div>
+        <div class="navbar-right">
+		<span style="color: black; margin-left: 10px;">로그인 : <%= school %> | </span>
+	            <a href="/apply">교육신청</a>
+                    <a href="/mypage">마이페이지</a>
+                    <a href="/?message=로그아웃 되었습니다.">로그아웃</a>
+        </div>
+    </nav>
+    <hr>
+
+    <!-- 여기에 본문 내용을 작성하세요 -->
+    <div class="container mt-4 status">
+	    <h1>신청 현황</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>신청번호</th>
+        <th>학교</th>
+        <th>전화번호</th>
+        <th>학교 유형</th>
+        <th>교원/학부모</th>
+        <th>주제</th>
+        <th>시작시간</th>
+        <th>종료시간</th>
+        <th>학급 수</th>
+        <th>신청 날짜</th>
+	<th>신청 취소</th>
+      </tr>
+    </thead>
+    <tbody id="statusTableBody">
+      <!-- 테이블 데이터가 동적으로 추가될 부분 -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+	// 날짜 및 시간 포맷팅 함수
+	function formatDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+function formatTime(timeString) {
+  const [hours, minutes] = timeString.split(':');
+  return `${hours}:${minutes}`;
+}
+  // API 호출하여 테이블 데이터 가져오기
+	const school = '<%= school %>';
+if (school == '') {
+	window.location.href = '/?message=세션이 만료되었습니다. 재로그인 해주세요.';
+} else {
+fetch('/api/status?school=<%= school %>', {
+	headers: {
+	'Content-Type': 'application/json',
+	'School': encodeURIComponent(school)
+	}
+})
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.getElementById('statusTableBody');
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.id}</td>
+          <td>${item.school}</td>
+          <td>${item.phone}</td>
+          <td>${item.schoolType}</td>
+          <td>${item.type}</td>
+          <td>${item.subject}</td>
+          <td>${formatTime(item.startTime)}</td>
+          <td>${formatTime(item.endTime)}</td>
+          <td>${item.class}</td>
+          <td>${formatDate(item.applicationDate)}</td>
+	  <td><button onclick="deleteStatus(${item.id})">취소</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(error => console.log(error));
+
+
+  async function deleteStatus(id) {
+	  const no = id;
+	  const response = await fetch(`/api/cancel/${no}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      // 성공적으로 삭제되었을 때 처리
+      console.log(`ID ${id}의 데이터를 삭제하였습니다.`);
+      // 페이지 새로고침하여 변경된 데이터 표시
+      window.location.reload();
+    } else {
+      // 실패했을 때 처리
+	    console.log(response);
+      console.error(`ID ${id}의 데이터 삭제에 실패하였습니다.`);
+    }
+  }
+}
+</script>
+    </div>
+
+    <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
+    <!-- Bootstrap 및 jQuery 스크립트 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+  table {
+    width: 100%;
+    border: 1px solid #444444;
+    border-collapse: collapse;
+    margin: 10px;
+  }
+  th, td {
+    border: 1px solid #444444;
+    align-items: center;
+    text-align: center;
+  }
+</style>
+</body>
+
+</html>
+

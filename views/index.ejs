@@ -33,9 +33,15 @@
     <!-- 여기에 본문 내용을 작성하세요 -->
     <div class="container mt-4">
 	    <h1>로그인</h1>
+	    <h5 id="message"></h5>
 	    <form action="/api/login" method="POST" class="signup">
-		    <label for="username">사용자 이름:</label>
-		    <input type="text" id="username" name="username" required>
+		    <label for="school">학교 선택:</label>
+		    <select id="school" name="school" required>
+			    <option value="" disabled selected>학교를 선택하세요</option>
+			    <% schools.forEach(school => { %>
+			    <option value="<%- school %>"><%- school %></option>
+			    <% }); %>
+		    </select>
 		    <label for="password">비밀번호:</label>
 		    <input type="password" id="password" name="password" required>
 		    <button type="submit">로그인</button>
@@ -48,6 +54,31 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script>
+		// index.ejs (또는 다른 페이지에서 사용하는 스크립트 부분)
+
+		// URL에서 query string을 추출하는 함수
+		function getQueryStringValue(key) {
+			const urlParams = new URLSearchParams(window.location.search);
+			return urlParams.get(key);
+		}
+
+// 페이지가 로드될 때 실행되는 함수
+function onLoad() {
+	const message = getQueryStringValue('message');
+	if (message) {
+		// 메시지가 존재하면 화면에 표시
+		const messageDiv = document.getElementById('message');
+		messageDiv.innerText = message;
+	}
+	else {
+		$('#message').hide();
+	}
+}
+
+// 페이지 로드 시 onLoad 함수 실행
+window.onload = onLoad;
+	</script>
 </body>
 
 </html>

@@ -47,7 +47,7 @@ app.use('/api', apiRouter); // /api 경로로 들어오는 요청은 apiRouter�
 
 app.get('/', (req,res) => {
         const user = req.session.user;
-	res.render('index', {user});
+	res.render('index', {schools: schoolList, user});
 });
 
 app.get('/login', (req,res) => {
@@ -58,6 +58,11 @@ app.get('/signup', (req,res) => {
 	console.log(req.body);
         const user = req.session.user;
         res.render('signup', {schools: schoolList, user: req.session.user});
+});
+
+app.get('/mypage', (req,res) => {
+	const school = req.session.school;
+	res.render('mypage', {school});
 });
 
 // 서버 실행

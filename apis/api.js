@@ -16,7 +16,6 @@ const pool = mysql.createPool({
 
 // 회원 가입 API
 router.post('/signup', async (req, res) => {
-        console.log(req.body);
   const { school, name, phone, password } = req.body;
 
 // 필수 데이터가 누락되었는지 확인
@@ -27,33 +26,40 @@ router.post('/signup', async (req, res) => {
   try {
     // 사용자가 이미 존재하는지 확인
     const connection = await pool.getConnection();
-    const [existingUser] = await connection.query('SELECT * FROM users WHERE name = ?', [school]);
+    const [existingUser] = await connection.query('SELECT * FROM users WHERE school = ?', [school]);
     connection.release();
 
+	  console.log(existingUser);
+
     if (existingUser.length > 0) {
-      return res.status(400).json({ message: '이미 계정이 존재하는 학교입니다.' });
+            return res.redirect('/signup?message=이미 계정이 존재하는 학교입니다.');
     }
 
     // 비밀번호 암호화
-    //const hashedPassword = await bcrypt.hash(password, 10);
+	  const saltRounds = 10;
 
     // 새로운 사용자 생성
     const newUser = {
       school,
       name,
       phone,
-      password,
+      password: await bcrypt.hash(password, saltRounds),
     };
 
     const insertQuery = 'INSERT INTO users SET ?';
     const insertValues = [newUser];
 
     const insertResult = await pool.query(insertQuery, insertValues);
+	  console.log(insertValues);
+	  console.log(insertResult[0].affectedRows);
 
-    if (insertResult.affectedRows === 1) {
-      return res.status(201).json({ message: '회원가입이 성공적으로 완료되었습니다.' });
+    if (insertResult[0].affectedRows === 1) {
+	    console.log('성공');
+	    return res.redirect('/?message=회원가입이 성공적으로 완료되었습니다.');
+      //return res.status(201).json({ message: '회원가입이 성공적으로 완료되었습니다.' });
     } else {
-      return res.status(500).json({ message: '회원가입에 실패하였습니다.' });
+	    console.log('실패');
+            return res.redirect('/signup?message=회원가입이 실패했습니다..');
     }
   } catch (error) {
     console.log(error);
@@ -63,26 +69,73 @@ router.post('/signup', async (req, res) => {
 
 // 로그인 API
 router.post('/login', async (req, res) => {
-  const { name, password } = req.body;
+  const { school, password } = req.body;
 
   try {
     // 사용자가 존재하는지 확인
     const connection = await pool.getConnection();
-    const [user] = await connection.query('SELECT * FROM users WHERE name = ?', [name]);
+    const [user] = await connection.query('SELECT * FROM users WHERE school = ?', [school]);
     connection.release();
 
     if (user.length === 0) {
-      return res.status(401).json({ message: '해당 아이디가 없습니다. 회원가입 해주시기 바랍니다.' });
+            return res.redirect('/?message=해당학교에 계정이 없습니다. 회원가입 해주십시오.');
     }
 
     // 비밀번호 확인
     const isPasswordValid = await bcrypt.compare(password, user[0].password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: '유효하지 않은 비밀번호입니다.' });
+            return res.redirect('/?message=비밀번호가 맞지 않습니다..');
+    }
+// 로그인 성공 시 세션에 학교 정보 저장
+    req.session.school = school;
+    return res.redirect('/mypage');
+  } catch (error) {
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// status 테이블 데이터 조회 API
+router.get('/status', async (req, res) => {
+  const school = req.query.school; // HTTP 헤더에서 school 정보를 가져옴
+
+  try {
+    const connection = await pool.getConnection();
+    let query = 'SELECT * FROM status';
+
+    if (school) {
+      // school 정보가 있을 경우 조회 조건에 추가
+      query += ' WHERE school = ?';
     }
 
-    return res.status(200).json({ message: '로그인이 성공적으로 완료되었습니다.' });
+    const [statusData] = await connection.query(query, [school]);
+    connection.release();
+
+    return res.status(200).json(statusData);
   } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// status 테이블 데이터 삭제 API
+router.delete('/cancel/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+
+  try {
+    const connection = await pool.getConnection();
+    const deleteQuery = 'DELETE FROM status WHERE id = ?';
+    const [deleteResult] = await connection.query(deleteQuery, [id]);
+    connection.release();
+
+    if (deleteResult.affectedRows === 0) {
+      return res.status(404).json({ message: '해당 신청번호를 찾을 수 없습니다.' });
+    }
+    if (deleteResult.affectedRows === 1) {
+      return res.status(201).json({ message: '취소 완료!' });
+    }
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 });
