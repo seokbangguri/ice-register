@@ -1,4 +1,8 @@
 /* styles.css */
+html,body {
+	margin:0;
+	padding:0;
+}
 
 /* 네비게이션 바 스타일 */
 .navbar {
@@ -38,7 +42,7 @@
 	flex-direction: column;
 	width: 50%;
 	margin: auto;
-	margin-top: 40px;
+	margin-top: 150px;
 	padding: 15px;
 	justify-content: center;
 	align-items: center;
@@ -47,6 +51,7 @@
 }
 .status {
 	width: 90%;
+	margin-top: 40px;
 }
 .signup {
 	display: flex;
@@ -60,10 +65,48 @@
 }
 .signup button {
 	margin-bottom: 20px;
-	height: 30px
+	height: 30px;
+	background: black;
+	border-radius: 10px;
+	color: white;
+}
+.signup select,input{
+	padding: 10px;
+	font-size: 15px;
 }
 #statusTableBody button {
 	margin: 10px;
 }
+#phoneAreaCode {
+	width: 40px;
+}
+.screen-block {
+	display: none;
+}
 /* 기타 원하는 스타일 추가 */
+@media screen and (max-width: 800px) {
+	.screen-block {
+		display: flex;
+		position: fixed;
+		z-index: 10;
+		background-color: #00000050;
+		width: 100%;
+		height: 100%;
+		justify-content: center;
+		align-items: center;
+		margin: auto;
+	}
 
+	.warn-msg {
+		display: flex;
+		width: 70%;
+		height: 80%;
+		background-color: #ffffffee;
+		color: black;
+		border-radius: 20px;
+		align-items: center;
+		justify-content: center;
+		font-size: 18px;
+		font-weight: bolder;
+	}
+}

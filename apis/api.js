@@ -42,7 +42,7 @@ router.post('/signup', async (req, res) => {
     const newUser = {
       school,
       name,
-      phone,
+      phone: "032"+phone,
       password: await bcrypt.hash(password, saltRounds),
     };
 
