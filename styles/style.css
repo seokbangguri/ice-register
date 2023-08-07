@@ -43,6 +43,7 @@ html,body {
 	width: 50%;
 	margin: auto;
 	margin-top: 150px;
+	margin-bottom: 150px;
 	padding: 15px;
 	justify-content: center;
 	align-items: center;
@@ -82,6 +83,9 @@ html,body {
 }
 .screen-block {
 	display: none;
+}
+#totalClassesResult {
+	margin-top: 15px;
 }
 /* 기타 원하는 스타일 추가 */
 @media screen and (max-width: 800px) {

@@ -16,7 +16,7 @@
 	    <h3>학교로 찾아가는 노동인권교육 추가모집</h3>
         </div>
         <div class="navbar-right">
-		<span style="color: black; margin-left: 10px;">로그인 : <%= school %> | </span>
+		<span style="color: black; margin-right: 20px;">로그인 : <%= school %>   | </span>
 	            <a href="/apply">교육신청</a>
                     <a href="/mypage">마이페이지</a>
                     <a href="/?message=로그아웃 되었습니다.">로그아웃</a>
@@ -26,15 +26,14 @@
 
     <!-- 여기에 본문 내용을 작성하세요 -->
     <div class="container mt-4 status">
-	    <h1>신청 현황</h1>
+	    <h1>마이페이지</h1>
+	    <h3>신청 현황</h3>
   <table>
     <thead>
       <tr>
         <th>신청번호</th>
         <th>학교</th>
-        <th>전화번호</th>
-        <th>학교 유형</th>
-        <th>교원/학부모</th>
+        <th>교원/학부모/학생</th>
         <th>주제</th>
         <th>시작시간</th>
         <th>종료시간</th>
@@ -81,8 +80,6 @@ fetch('/api/status?school=<%= school %>', {
         row.innerHTML = `
           <td>${item.id}</td>
           <td>${item.school}</td>
-          <td>${item.phone}</td>
-          <td>${item.schoolType}</td>
           <td>${item.type}</td>
           <td>${item.subject}</td>
           <td>${formatTime(item.startTime)}</td>

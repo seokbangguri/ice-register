@@ -35,10 +35,23 @@
       <% }); %>
     </select>
 
-    <label for="name">담당자 이름:</label>
+    <label for="schoolType">학교 타입:</label>
+    <select id="schoolType" class="mySelect" name="schoolType" required>
+      <option value="" disabled selected>학교 타입</option>
+      <option value="초등학교">초등학교</option>
+      <option value="중학교">중학교</option>
+      <option value="고등학교">고등학교</option>
+      <option value="특목-고등학교">특목-고등학교</option>
+      <option value="특성화-고등학교">특성화-고등학교</option>
+      <option value="특수학교">특수학교</option>
+      <option value="각종학교-각종">각종학교-각종</option>
+      <option value="각종학교-대안">각종학교-대안</option> 
+    </select>
+
+    <label for="name">담당자 성함:</label>
     <input type="text" id="name" name="name" required>
 
-    <label for="phone">전화번호:</label>
+    <label for="phone">담당자 직통 전화번호:</label>
     <div>
       <input type="text" id="phoneAreaCode" name="phoneAreaCode" value="032" readonly>
       <input type="text" id="phone" name="phone" required>

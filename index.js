@@ -65,6 +65,21 @@ app.get('/mypage', (req,res) => {
 	res.render('mypage', {school});
 });
 
+app.get('/apply', (req,res) => {
+	const school = req.session.school;
+	res.render('apply', {school});
+});
+
+app.get('/student', (req,res) => {
+        const school = req.session.school;
+        res.render('student', {school});
+});
+
+app.get('/tandp', (req,res) => {
+        const school = req.session.school;
+        res.render('tandp', {school});
+});
+
 // 서버 실행
 app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);

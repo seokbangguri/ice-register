@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap 및 jQuery 스크립트 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="/styles/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <title>My Website</title>
+    <!-- 여기에 필요한 CSS 파일들을 링크하세요 -->
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-left" style="display: flex; color: black;">
+            <a><img src="https://www.ice.go.kr/images/template/00005/common/logo.png" alt="로고"></a>
+            <h3>학교로 찾아가는 노동인권교육 추가모집</h3>
+        </div>
+        <div class="navbar-right">
+                <span style="color: black; margin-right: 20px;">로그인 : <%= school %>   | </span>
+                    <a href="/apply">교육신청</a>
+                    <a href="/mypage">마이페이지</a>
+                    <a href="/?message=로그아웃 되었습니다.">로그아웃</a>
+        </div>
+    </nav>
+    <hr>
+
+    <!-- 여기에 본문 내용을 작성하세요 -->
+    <div class="container mt-4">
+	    <h1>학생 신청</h1>
+	    <form action="/api/studentApp" method="POST">
+		    <label for="date">날짜 선택:</label>
+		    <input type="date" id="dateInput" name="date" required> <button id="totalClassesBtn">검색</button><br>
+		    <div id="totalClassesResult"></div><hr><br><br>
+
+		    <label for="role">신청 구분:</label>
+		    <select id="role" name="role" required>
+			    <option value="학생">학생</option>
+		    </select><br><hr><br>
+
+                    <label for="grade">학년:</label>
+		    <select id="grade" name="grade" required>
+			    <option value="초5">초 5</option>
+                            <option value="초6">초 6</option>
+                            <option value="중1">중 1</option>
+                            <option value="중2">중 2</option>
+                            <option value="중3">중 3</option>
+                            <option value="고1">고 1</option>
+                            <option value="고2">고 2</option>
+                            <option value="고3">고 3</option>
+		    </select><br><hr><br>
+
+		    <label for="ST">시작 시간 선택:</label>
+		    <select id="ST" name="ST" required>
+		    </select><br><hr><br>
+
+		    <label for="ET">종료 시간 선택:</label>
+                    <select id="ET" name="ET" required>
+                    </select><br><hr><br>
+
+		    <label for="classTime">교시:</label>
+		    <p>(1,2 교시  => 1-2 입력)</p>
+		    <input type="text" id="classTime" name="classTime" required><br><hr><br>
+
+		    <label for="classes">학급 수 선택:</label>
+		    <select id="classes" name="classes" required>
+		    </select><br><hr><br>
+
+                    <label for="totalStu">총 학생 수:</label>
+                    <input type="text" id="totalStu" name="totalStu" required><br><hr><br>
+
+                    <label for="maleStu">남학생 수:</label>
+                    <input type="text" id="maleStu" name="maleStu"><br><hr><br>
+
+                    <label for="femaleStu">여학생 수:</label>
+                    <input type="text" id="femaleStu" name="femaleStu"><br><hr><br>
+
+		    <button type="submit">신청하기</button>
+	    </form>
+    </div>
+
+    <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
+    <script>
+        const school = '<%= school %>';
+if (school == '') {
+        window.location.href = '/?message=세션이 만료되었습니다. 재로그인 해주세요.';
+} else {
+	    $(document).ready(function() {
+		    const startTimeSelect = $('#ST');
+                    const endTimeSelect = $('#ET');
+		    const classSizeSelect = $('#classes');
+
+		    // 시작 시간 옵션 생성
+		    for (let hour = 8; hour <= 14; hour++) {
+			    for (let minute = 0; minute < 60; minute += 5) {
+				    const time = `${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0' : ''}${minute}`;
+				    if (time >= "08:40") {
+				    startTimeSelect.append(`<option value="${time}">${time}</option>`);
+                                    endTimeSelect.append(`<option value="${time}">${time}</option>`);
+				    }
+			    }
+		    }
+		    // 학급 수 옵션 생성
+		    for (let size = 1; size <= 24; size++) {
+			    classSizeSelect.append(`<option value="${size}">${size} 학급</option>`);
+		    }
+
+		    $('#totalClassesBtn').click(async function() {
+			    const dateInput = $('#dateInput').val();
+			    const response = await fetch(`/api/total-classes?date=${dateInput}`);
+			    const data = await response.json();
+			    const availableClasses = 24 - data.totalClasses;
+			    $('#totalClassesResult').text(`신청 가능 학급 수: ${availableClasses}`);
+		    });
+	    });
+}
+    </script>
+</body>
+
+</html>
+

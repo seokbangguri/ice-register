@@ -16,10 +16,10 @@ const pool = mysql.createPool({
 
 // 회원 가입 API
 router.post('/signup', async (req, res) => {
-  const { school, name, phone, password } = req.body;
+  const { school, schoolType, name, phone, password } = req.body;
 
 // 필수 데이터가 누락되었는지 확인
-  if (!school || !name || !phone || !password) {
+  if (!school || !schoolType || !name || !phone || !password) {
     return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
   }
 
@@ -41,6 +41,7 @@ router.post('/signup', async (req, res) => {
     // 새로운 사용자 생성
     const newUser = {
       school,
+      schoolType,
       name,
       phone: "032"+phone,
       password: await bcrypt.hash(password, saltRounds),
@@ -140,23 +141,99 @@ router.delete('/cancel/:id', async (req, res) => {
   }
 });
 
-// 모든 강사 신청 조회 API (예시: 임시적으로 applicants 배열 사용)
-let applicants = [];
-router.post('/apply', (req, res) => {
-  const { name, email, phone, expertise } = req.body;
+//교원/학부모 신청 API
+router.post('/tandpApp', async (req, res) => {
+  const { school, role, subject, date, ST, ET, total } = req.body;
 
-  if (!name || !email || !phone || !expertise) {
+  if (!school || !role || !subject || !date || !ST || !ET || !total) {
     return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
   }
 
-  const newApplicant = { name, email, phone, expertise };
-  applicants.push(newApplicant);
+  try {
+    const connection = await pool.getConnection();
 
-  return res.status(201).json({ message: '강사 신청이 성공적으로 접수되었습니다.' });
+    const insertQuery = `
+      INSERT INTO studentApp (school, role, subject, date, ST, ET, total)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const insertValues = [school, role, subject, date, ST, ET, total];
+
+    const insertResult = await connection.query(insertQuery, insertValues);
+    connection.release();
+
+    if (insertResult.affectedRows === 1) {
+      console.log('성공');
+      return res.redirect('/apply?message=신청이 성공적으로 완료되었습니다.');
+    } else {
+      console.log('실패');
+      return res.redirect('/apply?message=신청에 실패하였습니다.');
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
 });
 
-router.get('/applicants', (req, res) => {
-  return res.status(200).json(applicants);
+//학생 신청 API
+router.post('/studentApp', async (req, res) => {
+  const { grade, classes, classTime, date, ST, ET, totalStu, maleStu, femaleStu} = req.body;
+	const school = req.session.school;
+
+  if (!school || !grade || !classes || !classTime || !date || !ST || !ET || !totalStu ) {
+    return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
+  }
+
+  try {
+    const connection = await pool.getConnection();
+    
+    const insertQuery = `
+      INSERT INTO studentApp (school, grade, classes, classTime, date, ST, ET, totalStu, maleStu, femaleStu)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const insertValues = [school, grade, classes, classTime, date, ST, ET, totalStu, maleStu, femaleStu];
+
+    const insertResult = await connection.query(insertQuery, insertValues);
+    connection.release();
+	  console.log(insertResult);
+	  console.log(insertResult[0]);
+	  console.log(insertResult[0].affectedRows);
+
+    if (insertResult[0].affectedRows === 1) {
+      console.log('성공');
+      return res.redirect('/apply?message=신청이 성공적으로 완료되었습니다.');
+    } else {
+      console.log('실패');
+      return res.redirect('/apply?message=신청에 실패하였습니다.');
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// Express 애플리케이션에서 /total-classes 경로에 대한 GET 핸들러 추가
+router.get('/total-classes', async (req, res) => {
+  const { date } = req.query;
+
+  try {
+    const connection = await pool.getConnection();
+    const query = 'SELECT SUM(CAST(classes AS UNSIGNED)) AS totalClasses FROM studentApp WHERE date = ?';
+
+    const [result] = await connection.query(query, [date]);
+    connection.release();
+
+    if (result.length > 0) {
+      const totalClasses = result[0].totalClasses || 0;
+      return res.status(200).json({ totalClasses });
+    } else {
+      return res.status(404).json({ message: '해당 날짜의 데이터가 없습니다.' });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
 });
 
 module.exports = router;

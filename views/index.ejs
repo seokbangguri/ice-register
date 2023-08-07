@@ -46,7 +46,9 @@
 		    <input type="password" id="password" name="password" required>
 		    <button type="submit">로그인</button>
 	    </form>
+	    <h5 style="color: red;">점검시간 : 평일 20:00 ~ 21:00<br>위 시간에는 서비스를 이용하실 수 없습니다.<h5>
     </div>
+    <div class="container" id="currentTimeMessage"></div>
 
     <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
 	<script>
@@ -76,6 +78,16 @@ window.onload = onLoad;
 
 $(document).ready(function() {
 	$('.mySelect').select2();
+
+
+    const currentHour = new Date().getHours();
+
+    if (currentHour >= 20 && currentHour < 21) {
+	    $('.mt-4').hide();
+      $('#currentTimeMessage').text('20:00 ~ 21:00 서버 점검 시간입니다.');
+    } else {
+      $('#currentTimeMessage').hide();
+    }
 });
 	</script>
 </body>
