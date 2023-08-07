@@ -16,9 +16,9 @@ const testKey = process.env.TEST;
 //mysql 접속
 const connection = mysql.createConnection({
 	host: 'localhost',
-	user: 'seokbangguri',
-	password: '1234',
-	database: 'ice'
+	user: process.env.SQL_ID,
+	password: process.env.SQL_PW,
+	database: process.env.SQL_DB
 });
 
 connection.connect((err) => {

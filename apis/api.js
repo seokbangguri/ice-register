@@ -6,9 +6,9 @@ const bcrypt = require('bcrypt');
 // MySQL 데이터베이스 연결 설정
 const pool = mysql.createPool({
   host: 'localhost',
-  user: 'seokbangguri',
-  password: '1234',
-  database: 'ice',
+  user: process.env.SQL_ID,
+  password: process.env.SQL_PW,
+  database: process.env.SQL_DB,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
