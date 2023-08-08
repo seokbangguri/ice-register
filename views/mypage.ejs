@@ -4,6 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
+	<script>
+		  async function deleteStatus(id) {
+          const no = id;
+          const response = await fetch(`/api/cancel/${no}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      // 성공적으로 삭제되었을 때 처리
+      console.log(`ID ${id}의 데이터를 삭제하였습니다.`);
+      // 페이지 새로고침하여 변경된 데이터 표시
+      window.location.reload();
+    } else {
+      // 실패했을 때 처리
+            console.log(response);
+      console.error(`ID ${id}의 데이터 삭제에 실패하였습니다.`);
+    }
+  }
+
+  async function tpdeleteStatus(id) {
+          const no = id;
+          const response = await fetch(`/api/tpcancel/${no}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      // 성공적으로 삭제되었을 때 처리
+      console.log(`ID ${id}의 데이터를 삭제하였습니다.`);
+      // 페이지 새로고침하여 변경된 데이터 표시
+      window.location.reload();
+    } else {
+      // 실패했을 때 처리
+            console.log(response);
+      console.error(`ID ${id}의 데이터 삭제에 실패하였습니다.`);
+    }
+  }
+	</script>
+    <!-- Bootstrap 및 jQuery 스크립트 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="/styles/style.css">
     <title>My Website</title>
     <!-- 여기에 필요한 CSS 파일들을 링크하세요 -->
@@ -27,26 +69,49 @@
     <!-- 여기에 본문 내용을 작성하세요 -->
     <div class="container mt-4 status">
 	    <h1>마이페이지</h1>
-	    <h3>신청 현황</h3>
+	    <h3>학생</h3>
   <table>
     <thead>
       <tr>
         <th>신청번호</th>
         <th>학교</th>
-        <th>교원/학부모/학생</th>
-        <th>주제</th>
+        <th>학년</th>
         <th>시작시간</th>
         <th>종료시간</th>
         <th>학급 수</th>
-        <th>신청 날짜</th>
+	<th>총 학생 수</th>
+        <th>교육 날짜</th>
 	<th>신청 취소</th>
       </tr>
     </thead>
-    <tbody id="statusTableBody">
+    <tbody id="studentTableBody">
+      <!-- 테이블 데이터가 동적으로 추가될 부분 -->
+    </tbody>
+  </table>
+
+            <h3>교원/학부모</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>신청번호</th>
+        <th>학교</th>
+        <th>구분</th>
+	<th>주제</th>
+        <th>시작시간</th>
+        <th>종료시간</th>
+        <th>참여자 수</th>
+        <th>교육 날짜</th>
+        <th>신청 취소</th>
+      </tr>
+    </thead>
+    <tbody id="tandpTableBody">
       <!-- 테이블 데이터가 동적으로 추가될 부분 -->
     </tbody>
   </table>
 </div>
+    <footer>
+            <div>인천시 교육청 세계시민교육과 : 032-420-8263<br>웹 오류 문의 : seokbangguri@kakao.com</div>
+    </footer>
 
 <script>
 	// 날짜 및 시간 포맷팅 함수
@@ -66,6 +131,7 @@ function formatTime(timeString) {
 if (school == '') {
 	window.location.href = '/?message=세션이 만료되었습니다. 재로그인 해주세요.';
 } else {
+	//학생부분
 fetch('/api/status?school=<%= school %>', {
 	headers: {
 	'Content-Type': 'application/json',
@@ -74,18 +140,19 @@ fetch('/api/status?school=<%= school %>', {
 })
     .then(response => response.json())
     .then(data => {
-      const tableBody = document.getElementById('statusTableBody');
+	    console.log(data);
+      const tableBody = document.getElementById('studentTableBody');
       data.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${item.id}</td>
           <td>${item.school}</td>
-          <td>${item.type}</td>
-          <td>${item.subject}</td>
-          <td>${formatTime(item.startTime)}</td>
-          <td>${formatTime(item.endTime)}</td>
-          <td>${item.class}</td>
-          <td>${formatDate(item.applicationDate)}</td>
+          <td>${item.grade}</td>
+          <td>${formatTime(item.ST)}</td>
+          <td>${formatTime(item.ET)}</td>
+          <td>${item.classes}</td>
+	  <td>${item.totalStu}</td>
+          <td>${formatDate(item.date)}</td>
 	  <td><button onclick="deleteStatus(${item.id})">취소</button></td>
         `;
         tableBody.appendChild(row);
@@ -93,33 +160,37 @@ fetch('/api/status?school=<%= school %>', {
     })
     .catch(error => console.log(error));
 
-
-  async function deleteStatus(id) {
-	  const no = id;
-	  const response = await fetch(`/api/cancel/${no}`, {
-      method: 'DELETE',
-    });
-
-    if (response.ok) {
-      // 성공적으로 삭제되었을 때 처리
-      console.log(`ID ${id}의 데이터를 삭제하였습니다.`);
-      // 페이지 새로고침하여 변경된 데이터 표시
-      window.location.reload();
-    } else {
-      // 실패했을 때 처리
-	    console.log(response);
-      console.error(`ID ${id}의 데이터 삭제에 실패하였습니다.`);
-    }
-  }
+	//교원 및 학부모 부분
+fetch('/api/tpstatus?school=<%= school %>', {
+        headers: {
+        'Content-Type': 'application/json',
+        'School': encodeURIComponent(school)
+        }
+})
+    .then(response => response.json())
+    .then(data => {
+            console.log(data);
+      const tableBody = document.getElementById('tandpTableBody');
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.id}</td>
+          <td>${item.school}</td>
+          <td>${item.role}</td>
+          <td>${item.subject}</td>
+          <td>${formatTime(item.ST)}</td>
+          <td>${formatTime(item.ET)}</td>
+          <td>${item.total}</td>
+          <td>${formatDate(item.date)}</td>
+          <td><button onclick="tpdeleteStatus(${item.id})">취소</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(error => console.log(error));
 }
 </script>
     </div>
-
-    <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
-    <!-- Bootstrap 및 jQuery 스크립트 -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
   table {
     width: 100%;

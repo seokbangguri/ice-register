@@ -41,6 +41,7 @@ app.use(session({
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use('/styles', express.static(__dirname + '/styles'));
+app.use('/src', express.static(__dirname + '/src'));
 
 // 라우터 설정
 app.use('/api', apiRouter); // /api 경로로 들어오는 요청은 apiRouter로 전달

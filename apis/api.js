@@ -95,13 +95,13 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// status 테이블 데이터 조회 API
+// studentApp 테이블 데이터 조회 API
 router.get('/status', async (req, res) => {
   const school = req.query.school; // HTTP 헤더에서 school 정보를 가져옴
 
   try {
     const connection = await pool.getConnection();
-    let query = 'SELECT * FROM status';
+    let query = 'SELECT * FROM studentApp';
 
     if (school) {
       // school 정보가 있을 경우 조회 조건에 추가
@@ -118,14 +118,60 @@ router.get('/status', async (req, res) => {
   }
 });
 
-// status 테이블 데이터 삭제 API
+// tandpApp 테이블 데이터 조회 API
+router.get('/tpstatus', async (req, res) => {
+  const school = req.query.school; // HTTP 헤더에서 school 정보를 가져옴
+
+  try {
+    const connection = await pool.getConnection();
+    let query = 'SELECT * FROM tandpApp';
+
+    if (school) {
+      // school 정보가 있을 경우 조회 조건에 추가
+      query += ' WHERE school = ?';
+    }
+
+    const [statusData] = await connection.query(query, [school]);
+    connection.release();
+
+    return res.status(200).json(statusData);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// studentApp 테이블 데이터 삭제 API
 router.delete('/cancel/:id', async (req, res) => {
   const id = req.params.id;
   console.log(id);
 
   try {
     const connection = await pool.getConnection();
-    const deleteQuery = 'DELETE FROM status WHERE id = ?';
+    const deleteQuery = 'DELETE FROM studentApp WHERE id = ?';
+    const [deleteResult] = await connection.query(deleteQuery, [id]);
+    connection.release();
+
+    if (deleteResult.affectedRows === 0) {
+      return res.status(404).json({ message: '해당 신청번호를 찾을 수 없습니다.' });
+    }
+    if (deleteResult.affectedRows === 1) {
+      return res.status(201).json({ message: '취소 완료!' });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// tandpApp 테이블 데이터 삭제 API
+router.delete('/tpcancel/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+
+  try {
+    const connection = await pool.getConnection();
+    const deleteQuery = 'DELETE FROM tandpApp WHERE id = ?';
     const [deleteResult] = await connection.query(deleteQuery, [id]);
     connection.release();
 
@@ -143,7 +189,8 @@ router.delete('/cancel/:id', async (req, res) => {
 
 //교원/학부모 신청 API
 router.post('/tandpApp', async (req, res) => {
-  const { school, role, subject, date, ST, ET, total } = req.body;
+  const { role, subject, date, ST, ET, total } = req.body;
+	const school = req.session.school;
 
   if (!school || !role || !subject || !date || !ST || !ET || !total) {
     return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
@@ -153,7 +200,7 @@ router.post('/tandpApp', async (req, res) => {
     const connection = await pool.getConnection();
 
     const insertQuery = `
-      INSERT INTO studentApp (school, role, subject, date, ST, ET, total)
+      INSERT INTO tandpApp (school, role, subject, date, ST, ET, total)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -162,7 +209,7 @@ router.post('/tandpApp', async (req, res) => {
     const insertResult = await connection.query(insertQuery, insertValues);
     connection.release();
 
-    if (insertResult.affectedRows === 1) {
+    if (insertResult[0].affectedRows === 1) {
       console.log('성공');
       return res.redirect('/apply?message=신청이 성공적으로 완료되었습니다.');
     } else {
@@ -232,9 +279,31 @@ router.get('/total-classes', async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    return res.status(500).json({ message: '날짜를 선택하세요.' });
   }
 });
 
+//교원/학부모 신청 시 날짜 중복 신청 여부 조회 API
+router.get('/tandpdate', async (req, res) => {
+  const { date } = req.query;
+  const school = req.session.school;
+
+  try {
+    const connection = await pool.getConnection();
+    const query = 'SELECT *  FROM tandpApp WHERE date = ? AND school = ?';
+
+    const [result] = await connection.query(query, [date, school]);
+    connection.release();
+
+    if (result.length > 0) {
+      return res.status(200).json({ message: '해당 날짜는 이미 신청하셨습니다.' });
+    } else {
+      return res.status(200).json({ message: '해당 날짜는 신청 가능합니다.' });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: '날짜를 선택하세요.' });
+  }
+});
 module.exports = router;
 

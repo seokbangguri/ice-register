@@ -35,30 +35,46 @@
             <h1>교육 신청 페이지</h1>
             <form action="/api/tandpApp" method="POST">
                     <label for="date">날짜 선택:</label>
-                    <input type="date" id="date" name="date" required><br><br>
+		    <input type="date" id="dateInput" name="date" min="2023-09-04" max="2023-12-22" required><button id="totalClassesBtn">검색</button>
+                    <p>(추가신청 교육기간 : 09/04 ~ 12/22)</p>
+                    <div id="totalClassesResult"></div><br><hr><br>
 
                     <label for="role">신청 구분</label>
                     <select id="role" name="role" required>
                             <option value="교원">교원</option>
                             <option value="학부모">학부모</option>
-                    </select><br><br>
+                    </select><br><hr><br>
 
-                    <label for="startTime">시작 시간 선택:</label>
-                    <select id="startTime" name="startTime" required>
-                    </select><br><br>
+                    <label for="subject">주제</label>
+		    <select id="subject" name="subject" required>
+			    <option value="1: 노동법의 배경과 구조">①. 노동법의 배경과 구조</option>
+			    <option value="2: 임금 및 노동시간">②. 임금 및 노동시간</option>
+			    <option value="3: 청소년도 특수고용?">③. 청소년도 특수고용?</option>
+			    <option value="4: 아프니까 산재">④. 아프니까 산재</option>
+			    <option value="5: 막말과 하대는 직장 내 괴롭힘">⑤. 막말과 하대는 직장 내 괴롭힘</option>
+			    <option value="6: 제대로 퇴사하기">⑥. 제대로 퇴사하기</option>
+			    <option value="7: 법대로 하기">⑦. 법대로 하기</option>
+			    <option value="8: 청소년 노동의 이슈들">⑧. 청소년 노동의 이슈들</option>
+			    <option value="9: 노동인권관련 우리 사회 이슈">⑨. 노동인권관련 우리 사회 이슈</option>
+		    </select><br><hr><br>
 
-                    <label for="eneTime">시작 시간 선택:</label>
-                    <select id="endTime" name="endTime" required>
-                    </select><br><br>
+                    <label for="ST">시작 시간 선택:</label>
+                    <select id="ST" name="ST" required>
+                    </select><br><hr><br>
 
-                    <label for="classCount">학급 수 선택:</label>
-                    <select id="classCount" name="classCount" required>
-			    <option value="1" selected>1</option>
-                    </select><br><br>
+                    <label for="ET">종료 시간 선택:</label>
+                    <select id="ET" name="ET" required>
+                    </select><br><hr><br>
+
+                    <label for="total">참여자 수:</label>
+		    <input type="text" name="total" required><br><hr><br>
 
                     <button type="submit">신청하기</button>
             </form>
     </div>
+    <footer>
+            <div>인천시 교육청 세계시민교육과 : 032-420-8263<br>웹 오류 문의 : seokbangguri@kakao.com</div>
+    </footer>
 
     <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
     <script>
@@ -66,9 +82,13 @@
 if (school == '') {
         window.location.href = '/?message=세션이 만료되었습니다. 재로그인 해주세요.';
 } else {
+        main = {
+                av : 0,
+                isSearched: false,
+        }
             $(document).ready(function() {
-                    const startTimeSelect = $('#startTime');
-                    const endTimeSelect = $('#endTime');
+                    const startTimeSelect = $('#ST');
+                    const endTimeSelect = $('#ET');
 
                     // 시작 시간 옵션 생성
                     for (let hour = 8; hour <= 14; hour++) {
@@ -78,6 +98,28 @@ if (school == '') {
                                     endTimeSelect.append(`<option value="${time}">${time}</option>`);
                             }
                     }
+
+                    $('#totalClassesBtn').click(async function() {
+                            const dateInput = $('#dateInput').val();
+                            const response = await fetch(`/api/tandpdate?date=${dateInput}`);
+                            const data = await response.json();
+                            $('#totalClassesResult').text(data["message"]);
+                            main.isSearched = true;
+                    });
+
+                    $('select:not(#dateInput)').on('click', function() {
+                            if(!main.isSearched) {
+                                    alert("날짜 검색 먼저 해주세요.");
+                                    return false;
+                            }
+                    });
+
+                    $('input:not(#dateInput)').on('click', function() {
+                            if(!main.isSearched) {
+                                    alert("날짜 검색 먼저 해주세요.");
+                                    return false;
+                            }
+                    });
             });
 }
     </script>

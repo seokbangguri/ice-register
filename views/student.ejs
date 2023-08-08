@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/styles/style.css">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="/src/pre-data.js"></script>
     <title>My Website</title>
     <!-- 여기에 필요한 CSS 파일들을 링크하세요 -->
 </head>
@@ -35,7 +36,8 @@
 	    <h1>학생 신청</h1>
 	    <form action="/api/studentApp" method="POST">
 		    <label for="date">날짜 선택:</label>
-		    <input type="date" id="dateInput" name="date" required> <button id="totalClassesBtn">검색</button><br>
+		    <input type="date" id="dateInput" name="date" min="2023-09-04" max="2023-12-22" required> <button id="totalClassesBtn">검색</button>
+		    <p>(추가신청 교육기간 : 09/04 ~ 12/22)</p>
 		    <div id="totalClassesResult"></div><hr><br><br>
 
 		    <label for="role">신청 구분:</label>
@@ -83,6 +85,9 @@
 		    <button type="submit">신청하기</button>
 	    </form>
     </div>
+    <footer>
+            <div>인천시 교육청 세계시민교육과 : 032-420-8263<br>웹 오류 문의 : seokbangguri@kakao.com</div>
+    </footer>
 
     <!-- 여기에 필요한 JavaScript 파일들을 링크하세요 -->
     <script>
@@ -90,6 +95,10 @@
 if (school == '') {
         window.location.href = '/?message=세션이 만료되었습니다. 재로그인 해주세요.';
 } else {
+	main = {
+		av : 0,
+		isSearched: false,
+	}
 	    $(document).ready(function() {
 		    const startTimeSelect = $('#ST');
                     const endTimeSelect = $('#ET');
@@ -114,9 +123,39 @@ if (school == '') {
 			    const dateInput = $('#dateInput').val();
 			    const response = await fetch(`/api/total-classes?date=${dateInput}`);
 			    const data = await response.json();
-			    const availableClasses = 24 - data.totalClasses;
+			    const predataClasses = predata[dateInput] || 0;
+			    console.log(predataClasses);
+			    const availableClasses = 24 - data.totalClasses - predataClasses;
+			    main.av = availableClasses;
 			    $('#totalClassesResult').text(`신청 가능 학급 수: ${availableClasses}`);
+			    main.isSearched = true;
 		    });
+
+		    $('#classes').on('change', function() {
+			    // 선택된 값 가져오기
+			    const selectedValue = $(this).val();
+
+			    if(selectedValue > main.av) {
+				    alert("신청 가능 학급 수 보다 많습니다.");
+				    $(this).val("");
+			    }
+		    });
+
+		    $('select:not(#dateInput)').on('click', function() {
+			    if(!main.isSearched) {
+				    alert("날짜 검색 먼저 해주세요.");
+				    return false;
+			    }
+		    });
+
+                    $('input:not(#dateInput)').on('click', function() {
+                            if(!main.isSearched) {
+                                    alert("날짜 검색 먼저 해주세요.");
+				    return false;
+                            }
+                    });
+
+
 	    });
 }
     </script>
