@@ -10,7 +10,7 @@ const apiRouter = require('./apis/api');
 const schoolList = require('./src/schoolList');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 const testKey = process.env.TEST;
 
 //mysql 접속
@@ -85,4 +85,3 @@ app.get('/tandp', (req,res) => {
 app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
 });
-

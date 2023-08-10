@@ -43,6 +43,7 @@ html,body {
 	display: flex;
 	flex-direction: column;
 	width: 50%;
+	height: 50%;
 	margin: auto;
 	margin-top: 100px;
 	margin-bottom: 100px;
@@ -51,6 +52,14 @@ html,body {
 	align-items: center;
 	border-radius: 20px;
 	box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
+}
+.log {
+	width: 500px;
+	height: 520px;
+}
+select {
+	font-size: 15px;
+	padding: 5px;
 }
 .status {
 	width: 90%;
@@ -99,6 +108,14 @@ button {
 	font-size: 20px;
 	margin: 10px;
 	padding: 10px;
+	margin-top: 50px;
+	margin-bottom: 50px;
+}
+
+#totalClassesBtn, #submit {
+	margin-left: 20px;
+	width: 80px;
+	height: 40px;
 }
 
 #apply button {
@@ -126,14 +143,13 @@ button {
 
 	.warn-msg {
 		display: flex;
-		width: 70%;
-		height: 80%;
+		width: 100%;
+		height: 100%;
 		background-color: #ffffffee;
 		color: black;
-		border-radius: 20px;
 		align-items: center;
 		justify-content: center;
-		font-size: 18px;
+		font-size: 30px;
 		font-weight: bolder;
 	}
 }

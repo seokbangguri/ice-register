@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://www.ice.go.kr/images/template/00005/sub/ci_06.png">
   <!-- Bootstrap 및 jQuery 스크립트 -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -10,7 +11,7 @@
   <link rel="stylesheet" href="/styles/style.css">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <title>회원 가입</title>
+<title>인천광역시 교육청 노동인권교육 추가모</title>
 </head>
 <body>
     <nav class="navbar">
@@ -23,7 +24,7 @@
         </div>
     </nav>
     <hr>
-    <div class="container mt-4">
+    <div class="container mt-4 log">
   <h1>회원 가입</h1>
   <h5 id="message"></h5>
   <form action="/api/signup" method="POST" class="signup"> <!-- 수정된 부분 -->
@@ -51,11 +52,12 @@
     <label for="name">담당자 성함:</label>
     <input type="text" id="name" name="name" required>
 
-    <label for="phone">담당자 직통 전화번호:</label>
+    <label for="phone">담당자 직통 전화번호 ('-' 빼고 입력) :</label>
     <div>
       <input type="text" id="phoneAreaCode" name="phoneAreaCode" value="032" readonly>
       <input type="text" id="phone" name="phone" required>
     </div>
+    <div id="warn" style="color: red; margin-top: 10px;"></div>
 
     <label for="password">비밀번호:</label>
     <input type="password" id="password" name="password" required>
@@ -91,7 +93,18 @@ function onLoad() {
 window.onload = onLoad;
 
 $(document).ready(function() {
-  $('.mySelect').select2();
+	$('.mySelect').select2();
+
+	$('#phone').on('change', function () {
+		if($(this).val().length !== 7) {
+			$('#warn').show();
+			$('#warn').text('* 7자로 입력하세요');
+		} else {
+			$('#warn').hide();
+		}
+	});
+
+	
 });
 	</script>
 </body>
